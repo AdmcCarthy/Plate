@@ -25,3 +25,9 @@ Input is a site built by SubScout (>= 0.5.0) in which chart blocks carry `export
 Sizes at 300 dpi: A3 17 MP, A1 70 MP, A0 139 MP. Use the PDF for large sheets; PNG is a proof and is capped (large canvases also cost memory).
 
 See `styleguide/print.md`. Part of a set: SubScout (stories) -> Plate (plates) -> Sheet (maps, built on Relief).
+
+## Licence and acknowledgement
+
+MIT License with Acknowledgement ([LICENSE](LICENSE)): the MIT terms plus one condition. Anything built with this work says so,
+visibly and in plain words, and does not imply endorsement: "Built with Plate by Adam McCarthy (https://github.com/AdmcCarthy/Plate)". The wording is custom, so
+the licence is not OSI-approved. Third-party data and vendored code keep their own terms.
