@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en-GB" data-type="ledger" data-palette="{{ esc(fm.get('palette', 'tide')) }}" data-surface="{{ esc(fm.get('surface', 'nordic-cool')) }}">
+<head>
+<meta charset="utf-8">
+<title>{{ esc(plain_title) }} · plate</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../../runtime/css/tokens.css">
+<link rel="stylesheet" href="../../runtime/css/base.css">
+<link rel="stylesheet" href="../_assets/plate.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+</head>
+<body>
+<div class="pl-board" id="board">
+  <header class="pl-head">
+    <div class="pl-kicker">{{ esc(fm.get('kicker', '')) }}</div>
+    <h1 class="pl-title" id="pl-title">{{ spec.get('title', '') }}</h1>
+    {% if spec.get('subtitle') %}<p class="pl-sub">{{ spec['subtitle'] }}</p>{% endif %}
+    <div class="pl-slot pl-slot-top"></div>
+  </header>
+  <main class="pl-main">
+    <div class="ss-chart pl-chart" id="pl-chart"></div>
+    <aside class="pl-rail">
+      <div class="pl-slot pl-slot-rail"></div>
+      {% if spec.get('notes') %}<section class="pl-notes"><h2>Notes</h2><p>{{ esc(spec['notes']) }}</p></section>{% endif %}
+      {% if spec.get('exception') %}<section class="pl-notes"><h2>Declared exception</h2><p><b>{{ esc(spec['exception'].get('rule', '')) }}.</b> {{ esc(spec['exception'].get('reason', '')) }}</p></section>{% endif %}
+      <section class="pl-notes pl-confidence"><h2>Confidence</h2><p>{{ esc(conf_text) }}</p></section>
+    </aside>
+  </main>
+  <div class="pl-slot pl-slot-bottom"></div>
+  <footer class="pl-foot">{% for k, v in facts %}<span><b>{{ k }}</b>{{ esc(v) }}</span>{% endfor %}<span class="pl-credit">{{ esc(credit) }}</span></footer>
+  <div class="ss-legend pl-legend" id="pl-legend"></div>
+</div>
+<script type="application/json" id="pl-payload">{{ payload }}</script>
+<script type="module" src="../_assets/plate-page.js"></script>
+</body>
+</html>

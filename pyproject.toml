@@ -1,0 +1,36 @@
+[project]
+name = "plate"
+version = "0.1.0"
+description = "Print-grade data visualisation plates: physical page sizes, vector PDF, legends and furniture"
+readme = "README.md"
+authors = [{ name = "Adam McCarthy", email = "24669992+AdmcCarthy@users.noreply.github.com" }]
+requires-python = ">=3.12"
+dependencies = ["jinja2>=3.1.6", "pillow>=11", "playwright>=1.44", "pypdf>=5"]
+
+[project.scripts]
+plate = "plate:main"
+
+[build-system]
+requires = ["uv_build>=0.13.7,<0.14.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.2.0",
+    "ruff>=0.17.4",
+    "subscout",
+]
+
+[tool.uv.sources]
+subscout = { git = "https://github.com/AdmcCarthy/SubScout", tag = "v0.5.0" }
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 130
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
