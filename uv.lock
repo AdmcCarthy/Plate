@@ -512,7 +512,7 @@ requires-dist = [
 dev = [
     { name = "pytest", specifier = ">=9.2.0" },
     { name = "ruff", specifier = ">=0.17.4" },
-    { name = "subscout", git = "https://github.com/AdmcCarthy/SubScout?tag=v0.5.0" },
+    { name = "subscout", git = "https://github.com/AdmcCarthy/SubScout?tag=v0.6.0" },
 ]
 
 [[package]]
@@ -724,8 +724,8 @@ wheels = [
 
 [[package]]
 name = "subscout"
-version = "0.5.0"
-source = { git = "https://github.com/AdmcCarthy/SubScout?tag=v0.5.0#685eb40cf9519134ec14308db4e33b4f651baf8f" }
+version = "0.6.0"
+source = { git = "https://github.com/AdmcCarthy/SubScout?tag=v0.6.0#69aa29b75612f34d24f818f9a7e16cd9ad150416" }
 dependencies = [
     { name = "coloraide" },
     { name = "jinja2" },
