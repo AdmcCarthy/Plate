@@ -72,3 +72,26 @@ def test_qa_clean_and_manifest(rendered):
     bad = [(f["file"], f["qa"]) for f in m["files"] if f["qa"]]
     assert not bad, bad
     assert json.loads((out / "manifest.json").read_text())["files"]
+
+
+def test_contract_loader_reads_payload_json_and_rejects_unknown_versions(tmp_path):
+    from plate.render import load_contract
+
+    d = tmp_path / "export" / "f"
+    d.mkdir(parents=True)
+    good = {"contract": {"name": "subscout-export", "version": 1}, "id": "f", "fig": {"spec": {}}, "facts": [["Source", "x"]]}
+    (d / "payload.json").write_text(json.dumps(good))
+    assert load_contract(d)["facts"] == [["Source", "x"]]
+    (d / "payload.json").write_text(json.dumps({**good, "contract": {"name": "subscout-export", "version": 2}}))
+    with pytest.raises(SystemExit):
+        load_contract(d)
+
+
+def test_contract_and_legacy_page_give_the_same_footer_facts(site):
+    """SubScout >= 0.6 writes payload.json; 0.5 pages are parsed. Either way the plate carries the same facts."""
+    from plate.render import load_contract
+
+    for d in sorted((site / "export").iterdir()):
+        c = load_contract(d)
+        assert [k for k, _ in c["facts"]][:1] == ["Source"] and c["story"]["palette"] and c["id"] == d.name
+        assert c["meta"]["title"]

@@ -44,6 +44,37 @@ def read_payload(page: Path) -> dict:
     return json.loads(text.split('id="ss-payload">')[1].split("</script>")[0].replace("<\\/", "</"))
 
 
+def load_contract(export_dir: Path) -> dict:
+    """The figure's export contract: `payload.json` (SubScout >= 0.6), else rebuilt from the 0.5 proof page."""
+    pj = export_dir / "payload.json"
+    if pj.exists():
+        c = json.loads(pj.read_text(encoding="utf-8"))
+        if c.get("contract", {}).get("name") != "subscout-export" or c["contract"].get("version") != 1:
+            raise SystemExit(f"{pj}: unsupported export contract {c.get('contract')}")
+        return c
+    page = export_dir / "index.html"
+    c = read_payload(page)
+    src = page.read_text(encoding="utf-8")
+    spec = c["fig"]["spec"]
+    c["id"] = export_dir.name
+    c["story"] = {
+        "palette": (re.search(r'data-palette="([^"]*)"', src) or [None, "tide"])[1],
+        "surface": (re.search(r'data-surface="([^"]*)"', src) or [None, "nordic-cool"])[1],
+        "kicker": html.unescape((re.search(r'class="ex-kicker">([^<]*)<', src) or [None, ""])[1]),
+    }
+    c["facts"] = [[k, html.unescape(v)] for k, v in re.findall(r"<span><b>([^<]*)</b>([^<]*)</span>", src)]
+    c["credit"] = html.unescape((re.search(r'class="ex-credit">([^<]*)<', src) or [None, ""])[1])
+    c["meta"] = {
+        "title": spec.get("title", ""),
+        "subtitle": spec.get("subtitle", ""),
+        "notes": spec.get("notes", ""),
+        "exception": spec.get("exception"),
+        "confidence": spec.get("confidence", ""),
+    }
+    c.setdefault("runtime", "runtime")
+    return c
+
+
 def slug(s: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", s.lower()).strip("-") or "state"
 
@@ -60,31 +91,23 @@ def _git_rev(path: Path) -> str:
         return "unversioned"
 
 
-def write_plate_page(work: Path, fig_id: str, export_html: Path, plate: dict, story_rev: str) -> Path:
-    payload = read_payload(export_html)
+def write_plate_page(work: Path, fig_id: str, contract: dict, plate: dict, story_rev: str) -> Path:
+    payload = dict(contract)
     spec = payload["fig"]["spec"]
-    fm_src = export_html.read_text(encoding="utf-8")
-    fm = {
-        "palette": (re.search(r'data-palette="([^"]*)"', fm_src) or [None, "tide"])[1],
-        "surface": (re.search(r'data-surface="([^"]*)"', fm_src) or [None, "nordic-cool"])[1],
-        "kicker": html.unescape((re.search(r'class="ex-kicker">([^<]*)<', fm_src) or [None, ""])[1]),
-    }
-    foot = re.findall(r"<span><b>([^<]*)</b>([^<]*)</span>", fm_src)
-    facts = [(k, html.unescape(v)) for k, v in foot]
-    credit = html.unescape((re.search(r'class="ex-credit">([^<]*)<', fm_src) or [None, ""])[1])
-    today = dt.date.today().isoformat()
-    facts.append(("Plate", f"{today} · {story_rev}"))
-    conf = LEVEL.get(spec.get("confidence"), "")
+    st, meta = payload["story"], payload["meta"]
+    fm = {"palette": st.get("palette", "tide"), "surface": st.get("surface", "nordic-cool"), "kicker": st.get("kicker", "")}
+    facts = [(k, v) for k, v in payload["facts"]]
+    facts.append(("Plate", f"{dt.date.today().isoformat()} · {story_rev}"))
     payload["plate"] = plate
     env = jinja2.Environment(loader=jinja2.FileSystemLoader(TEMPLATES), autoescape=False)
     page = env.get_template("plate.html.j2").render(
         fm=fm,
         spec=spec,
         facts=facts,
-        credit=credit,
+        credit=payload.get("credit", ""),
         esc=html.escape,
-        plain_title=re.sub("<[^>]+>", "", spec.get("title", "")),
-        conf_text=CONF.get(spec.get("confidence"), conf),
+        plain_title=re.sub("<[^>]+>", "", meta.get("title") or spec.get("title", "")),
+        conf_text=CONF.get(meta.get("confidence") or spec.get("confidence"), ""),
         payload=json.dumps(payload, ensure_ascii=False, default=str).replace("</", "<\\/"),
     )
     d = work / "plate" / fig_id
@@ -167,7 +190,7 @@ def render(
     from playwright.sync_api import sync_playwright
 
     site, out = Path(site).resolve(), Path(out).resolve()
-    pages = sorted(p for p in (site / "export").glob("*/index.html"))
+    pages = sorted(p for p in (site / "export").glob("*/index.html"))  # one folder per exported figure
     if only:
         pages = [p for p in pages if p.parent.name in only]
     if not pages:
@@ -193,14 +216,14 @@ def render(
                 browser = pw.chromium.launch()
                 for ep in pages:
                     fig_id = ep.parent.name
-                    payload = read_payload(ep)
+                    payload = load_contract(ep.parent)
                     spec = payload["fig"]["spec"]
                     states = payload["states"] if all_states else payload["states"][-1:]
                     first_state = len(payload["states"]) - len(states)
                     for sname in size_names:
                         lay = sizes.layout(sizes.parse_size(sname), zoom)
                         plate_cfg = {**lay, "density": density, "legend": legend, "min_pt": min_pt}
-                        write_plate_page(work, fig_id, ep, plate_cfg, story_rev)
+                        write_plate_page(work, fig_id, payload, plate_cfg, story_rev)
                         mp = sizes.pixels_at(lay, dpi)
                         eff_dpi = dpi
                         if mp[0] * mp[1] / 1e6 > max_mp:

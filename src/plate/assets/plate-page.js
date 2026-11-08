@@ -30,6 +30,7 @@ const o = {
   label: spec.title?.replace(/<[^>]+>/g, "") ?? "", legendEl, spec, groups: spec.groups || P.groups,
   unitLabel: () => (spec.unit_label ? spec.unit_label.replace("{unit}", U().short) : ""),
   height: () => el.clientHeight, export: true, print: true,
+  pixelRatio: (window.devicePixelRatio || 1) * cfg.zoom,  // device pixels per layout pixel, for canvas figures
 };
 
 async function makeChart() {
