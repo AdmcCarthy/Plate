@@ -26,6 +26,9 @@ def build_parser() -> argparse.ArgumentParser:
     r.add_argument("--only", action="append", help="figure id (repeatable)")
     r.add_argument("--zoom", type=float, help="layout-to-paper zoom (default: automatic from sheet size)")
     r.add_argument("--min-pt", type=float, default=6.0)
+    r.add_argument(
+        "--max-mp", type=float, default=20.0, help="PNG size cap in megapixels (dpi is lowered to fit; use the PDF for print)"
+    )
     r.add_argument("--all-states", action="store_true", help="render every story state, not just the final one")
     r.add_argument("--strict", action="store_true", help="exit 1 if any QA issue or page error is found")
     s = sub.add_parser("sizes", help="list paper sizes with pixel counts")
@@ -55,6 +58,7 @@ def main(argv: list[str] | None = None) -> int:
         a.only,
         a.zoom,
         a.min_pt,
+        a.max_mp,
         all_states=a.all_states,
     )
     bad = 0

@@ -23,3 +23,8 @@ Extends the SubScout style guide (language, rules, uncertainty) for paper and PD
 ## Static first
 - The deliverable is a file: PDF (vector), PNG at a stated dpi, or both. Interaction belongs to the story page.
 - Large files are not committed; they are rendered in CI or locally and attached to releases. The manifest is committed.
+
+## Canvas figures
+- Figures drawn on canvas (dense layers such as Tulip's bulb) are rasterised inside the PDF at `opts.pixelRatio` device
+  pixels per layout pixel; vector parts (labels, axes, legend, furniture) stay vector. Figures should size canvases with
+  `opts.pixelRatio` and skip ahead-painting of other story states when `opts.export` is set.

@@ -17,11 +17,11 @@ Input is a site built by SubScout (>= 0.5.0) in which chart blocks carry `export
 | `--size` | `a4`..`a0` (`-landscape` / `-portrait`), `slide`, `square`, `WxHmm`; repeatable |
 | `--density standard\|rich` | `rich` adds a notes rail (notes, declared exception, confidence) |
 | `--legend top\|rail\|bottom` | Named legend slot |
-| `--dpi`, `--format` | PNG resolution (capped at 120 MP) and `pdf` / `png` |
+| `--dpi`, `--format` | PNG resolution (capped by `--max-mp`, default 20 MP; the PDF is the print product) and `pdf` / `png` |
 | `--theme light\|dark` | Colour scheme; light for print |
 | `--all-states` | Every story state, not only the final view |
 | `--strict` | Exit 1 on any QA finding (text under 6 pt, overflow, missing source or confidence) |
 
-Sizes at 300 dpi: A3 17 MP, A1 70 MP, A0 139 MP. Use the PDF for large sheets; raster is capped.
+Sizes at 300 dpi: A3 17 MP, A1 70 MP, A0 139 MP. Use the PDF for large sheets; PNG is a proof and is capped (large canvases also cost memory).
 
 See `styleguide/print.md`. Part of a set: SubScout (stories) -> Plate (plates) -> Sheet (maps, built on Relief).

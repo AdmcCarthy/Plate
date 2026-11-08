@@ -184,7 +184,7 @@ def render(
     only: list[str] | None = None,
     zoom: float | None = None,
     min_pt: float = 6.0,
-    max_mp: float = 120.0,
+    max_mp: float = 20.0,
     all_states: bool = False,
 ) -> dict:
     from playwright.sync_api import sync_playwright
@@ -241,7 +241,7 @@ def render(
                                 errors: list[str] = []
                                 pg.on("pageerror", lambda e, errors=errors: errors.append(str(e)))
                                 pg.goto(f"{url}plate/{fig_id}/?theme={theme}&state={i}")
-                                pg.wait_for_function("document.body.dataset.ready === '1'", timeout=60000)
+                                pg.wait_for_function("document.body.dataset.ready === '1'", timeout=300000)
                                 issues = pg.evaluate("window.__plateQA")
                                 stem = f"{lay['name']}-{theme}-{slug(st['name'])}"
                                 d = out / fig_id
@@ -285,7 +285,7 @@ def render(
                                     )
                                 if "png" in formats:
                                     f = d / f"{stem}.png"
-                                    pg.screenshot(path=str(f), type="png")
+                                    pg.screenshot(path=str(f), type="png", timeout=300000)
                                     stamp_png(
                                         f,
                                         eff_dpi,

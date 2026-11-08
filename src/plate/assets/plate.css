@@ -14,7 +14,7 @@ html, body { margin: 0; background: var(--ss-surface); color: var(--ss-text); fo
 .pl-title { font: var(--ss-display-weight, 500) 34px/1.15 var(--ss-font-display); letter-spacing: -0.01em; margin: 8px 0 6px; text-wrap: balance; max-width: 48ch; }
 .pl-sub { margin: 0 0 12px; font-size: 16px; color: var(--ss-text-muted); max-width: 90ch; }
 .pl-chart { position: relative; min-height: 0; display: flex; align-items: center; justify-content: center; }
-.pl-chart > * { max-width: 100%; }
+.pl-chart > * { width: 100%; max-width: 100%; }  /* figures fill the stage; their own layout centres inside */
 .pl-rail { display: none; flex-direction: column; gap: 18px; font-size: 13px; line-height: 1.45; color: var(--ss-text-muted); border-left: 1px solid var(--ss-border-subtle); padding-left: 20px; }
 .pl-board[data-density="rich"] .pl-rail, .pl-board[data-legend="rail"] .pl-rail { display: flex; }
 .pl-board:not([data-density="rich"]) .pl-notes { display: none; }
